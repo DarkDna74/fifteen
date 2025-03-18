@@ -119,6 +119,9 @@
 <body>
     <h2>Card Selection</h2>
     <div class="counter" id="counter"></div>
+    <div id="idShow">
+        <div id="idStack"></div>
+    </div>
     <div class="progress-bar">
         <div class="progress" id="progress-bar"></div>
     </div>
@@ -144,25 +147,75 @@
         }
         
 
-        function createCardGrid(clickHandler) {
-    let gridHTML = "<div class='card-grid'>";
-    // Define the suits in desired order
-    const suits = ['♣', '♥', '♠', '♦'];
-    const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-    
-    // Loop through each value
-    for (let i = 0; i < values.length; i++) {
-        // Loop through each suit in the specified order
-        for (let j = 0; j < suits.length; j++) {
-            const card = values[i] + suits[j];
-            const colorClass = getColorClass(card);
-            gridHTML += `<button class="card-button ${colorClass}" onclick="${clickHandler}('${card}', this)">${card}</button>`;
+        function generateTable2(cards, divId) {
+            let table = document.createElement("table");
+            table.border = "1";
+
+            for (let i = 0; i < 13; i++) {
+                let row = table.insertRow();
+                for (let j = 0; j < 4; j++) {
+                    let index = i + j * 13;
+                    let cell = row.insertCell();
+                    cell.textContent = `${index + 1}: ${cards[index]}`;
+                }
+            }
+
+            let container = document.getElementById(divId);
+            if (container) {
+                container.innerHTML = "";
+                container.appendChild(table);
+            } else {
+                console.error("Div with id " + divId + " not found.");
+            }
         }
-    }
-    
-    gridHTML += "</div>";
-    document.getElementById("table-container").innerHTML = gridHTML;
-}
+
+
+        function generateTable(cards, divId) {
+            document.getElementById("table-container").innerHTML = "";
+            let gridHTML = "<div class='card-grid'>";
+            // Define the suits in desired order
+            const suits = ['♣', '♥', '♠', '♦'];
+            const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            let l = 0;
+            // Loop through each value
+            for (let i = 0; i < values.length; i++) {
+                // Loop through each suit in the specified order
+                for (let j = 0; j < suits.length; j++) {
+                    let card = cards[l];
+
+                    //const card = values[i] + suits[j];
+                    const colorClass = getColorClass(card);
+                    gridHTML += `<button class="card-button ${colorClass}", this)">${l+1}: ${card}</button>`;
+                    l+=1;
+                }
+            }
+            
+            gridHTML += "</div>";
+            document.getElementById("table-container").innerHTML = gridHTML;
+        }
+     
+
+
+
+        function createCardGrid(clickHandler) {
+            let gridHTML = "<div class='card-grid'>";
+            // Define the suits in desired order
+            const suits = ['♣', '♥', '♠', '♦'];
+            const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            let colorClass ="";
+            // Loop through each value
+            for (let i = 0; i < values.length; i++) {
+                // Loop through each suit in the specified order
+                for (let j = 0; j < suits.length; j++) {
+                    const card = values[i] + suits[j];
+                    colorClass = getColorClass(card);
+                    gridHTML += `<button class="card-button ${colorClass}" onclick="${clickHandler}('${card}', this)">${card}</button>`;
+                }
+            }
+           
+            gridHTML += "</div>";
+            document.getElementById("table-container").innerHTML = gridHTML;
+        }
      
 
         function createCardGrid2(clickHandler) {
@@ -209,11 +262,37 @@
             updateProgressBar(chosenArray.length, 15);
             
             if (chosenArray.length === 15) {
-                showFinalSelection();
+                showFinalSelection(chosenArray);
             }
         }
+
+        function showFinalSelection(cards) { 
+                document.querySelector("h2").innerText = "Your 15 Cards";
+                document.getElementById("counter").style.display = "none";
+                document.querySelector(".progress-bar").style.display = "none";
+                
+                // Ordina chosenArray in base agli indici in selectedCards
+                const orderedCards = chosenArray.sort((a, b) => {
+                    const indexA = selectedCards.indexOf(a);
+                    const indexB = selectedCards.indexOf(b);
+                    return indexA - indexB; // Ordina in ordine crescente degli indici
+                });
+                let colorClass = "2;"
+                let finalHTML = "<ul class='final-list'>";
+            
+                orderedCards.forEach((card, index) => {
+                    colorClass = getColorClass(card);
+                    finalHTML += `<li class="final-item"><span>${index + 1}</span><span class="${colorClass}">${card}</span></li>`;
+            
+                });
+              //  finalHTML += "</ul>";
+                
+                finalHTML += `<li class="final-item"><span style="display: flex; justify-content: center;"><button class="card-button ${colorClass}" style="width: 100px;" onclick="startSecondPhase()">Repeat</button></span></li>`;
+                finalHTML += "</ul>";
+                document.getElementById("table-container").innerHTML = finalHTML;
+            }
         
-        function showFinalSelection() {
+        function showFinalSelection2() {
             document.querySelector("h2").innerText = "Your 15 Cards";
             document.getElementById("counter").style.display = "none";
             document.querySelector(".progress-bar").style.display = "none";
@@ -229,6 +308,8 @@
         
         function checkStoredStack() {
             if (localStorage.getItem("stack")) {
+                selectedCards = JSON.parse(localStorage.getItem("stack"));
+               // alert(selectedCards);
                 if (confirm("Do you want to use the saved stack?")) {
                     startSecondPhase();
                     return;
@@ -242,6 +323,9 @@
         }
         
         checkStoredStack();
+        /*if ( selectedCards.length >0 )
+             generateTable(selectedCards, "idStack");
+    */
     </script>
 </body>
 </html>
