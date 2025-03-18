@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Selection</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --accent-color: #bb86fc;
+            --hearts-diamonds: #ff5555;
+            --clubs-spades: #88ccff;
+            --disabled-bg: #333333;
+            --disabled-text: #777777;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        h2 {
+            text-align: center;
+            margin: 10px 0;
+            color: var(--accent-color);
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin: 0 auto;
+            max-width: 100%;
+        }
+        
+        .card-button {
+            background-color: var(--card-bg);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-color);
+            padding: 10px 0;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        .card-button:active {
+            transform: scale(0.95);
+        }
+        
+        .card-button:hover:not(.disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+        
+        .hearts, .diamonds {
+            color: var(--hearts-diamonds);
+        }
+        
+        .clubs, .spades {
+            color: var(--clubs-spades);
+        }
+        
+        .disabled {
+            background-color: var(--disabled-bg);
+            color: var(--disabled-text);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: #333333;
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .final-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 auto;
+            max-width: 250px;
+        }
+        
+        .final-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            margin: 5px 0;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .counter {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Card Selection</h2>
+    <div class="counter" id="counter"></div>
+    <div class="progress-bar">
+        <div class="progress" id="progress-bar"></div>
+    </div>
+    <div id="table-container"></div>
+    
+    <script>
+        const cards = [
+            "A♣", "2♣", "3♣", "4♣", "5♣", "6♣", "7♣", "8♣", "9♣", "10♣", "J♣", "Q♣", "K♣",
+            "A♥", "2♥", "3♥", "4♥", "5♥", "6♥", "7♥", "8♥", "9♥", "10♥", "J♥", "Q♥", "K♥",
+            "A♠", "2♠", "3♠", "4♠", "5♠", "6♠", "7♠", "8♠", "9♠", "10♠", "J♠", "Q♠", "K♠",
+            "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦"
+        ];
+        
+        let selectedCards = [];
+        let chosenArray = [];
+        
+        function getColorClass(card) {
+            if (card.includes('♥') || card.includes('♦')) {
+                return card.includes('♥') ? 'hearts' : 'diamonds';
+            } else {
+                return card.includes('♣') ? 'clubs' : 'spades';
+            }
+        }
+        
+
+        function createCardGrid(clickHandler) {
+    let gridHTML = "<div class='card-grid'>";
+    // Define the suits in desired order
+    const suits = ['♣', '♥', '♠', '♦'];
+    const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+    
+    // Loop through each value
+    for (let i = 0; i < values.length; i++) {
+        // Loop through each suit in the specified order
+        for (let j = 0; j < suits.length; j++) {
+            const card = values[i] + suits[j];
+            const colorClass = getColorClass(card);
+            gridHTML += `<button class="card-button ${colorClass}" onclick="${clickHandler}('${card}', this)">${card}</button>`;
+        }
+    }
+    
+    gridHTML += "</div>";
+    document.getElementById("table-container").innerHTML = gridHTML;
+}
+     
+
+        function createCardGrid2(clickHandler) {
+            let gridHTML = "<div class='card-grid'>";
+            for (let i = 0; i < cards.length; i++) {
+                const colorClass = getColorClass(cards[i]);
+                gridHTML += `<button class="card-button ${colorClass}" onclick="${clickHandler}('${cards[i]}', this)">${cards[i]}</button>`;
+            }
+            gridHTML += "</div>";
+            document.getElementById("table-container").innerHTML = gridHTML;
+        }
+        
+        function updateProgressBar(current, total) {
+            const percentage = (current / total) * 100;
+            document.getElementById("progress-bar").style.width = percentage + "%";
+            document.getElementById("counter").innerText = `${current} / ${total} selected`;
+        }
+        
+        function selectCard(card, btn) {
+            selectedCards.push(card);
+            btn.disabled = true;
+            btn.classList.add("disabled");
+            updateProgressBar(selectedCards.length, 52);
+            
+            if (selectedCards.length === 52) {
+                localStorage.setItem("stack", JSON.stringify(selectedCards));
+                startSecondPhase();
+            }
+        }
+        
+        function startSecondPhase() {
+            selectedCards = JSON.parse(localStorage.getItem("stack"));
+            chosenArray = [];
+            document.getElementById("table-container").innerHTML = "";
+            document.querySelector("h2").innerText = "Select 15 Cards";
+            updateProgressBar(0, 15);
+            createCardGrid("chooseCard");
+        }
+        
+        function chooseCard(card, btn) {
+            chosenArray.push(card);
+            btn.disabled = true;
+            btn.classList.add("disabled");
+            updateProgressBar(chosenArray.length, 15);
+            
+            if (chosenArray.length === 15) {
+                showFinalSelection();
+            }
+        }
+        
+        function showFinalSelection() {
+            document.querySelector("h2").innerText = "Your 15 Cards";
+            document.getElementById("counter").style.display = "none";
+            document.querySelector(".progress-bar").style.display = "none";
+            
+            let finalHTML = "<ul class='final-list'>";
+            chosenArray.forEach((card, index) => {
+                const colorClass = getColorClass(card);
+                finalHTML += `<li class="final-item"><span>${index + 1}</span><span class="${colorClass}">${card}</span></li>`;
+            });
+            finalHTML += "</ul>";
+            document.getElementById("table-container").innerHTML = finalHTML;
+        }
+        
+        function checkStoredStack() {
+            if (localStorage.getItem("stack")) {
+                if (confirm("Do you want to use the saved stack?")) {
+                    startSecondPhase();
+                    return;
+                } else {
+                    localStorage.removeItem("stack");
+                }
+            }
+            document.querySelector("h2").innerText = "Select All Cards";
+            updateProgressBar(0, 52);
+            createCardGrid("selectCard");
+        }
+        
+        checkStoredStack();
+    </script>
+</body>
+</html>
+
+
+
