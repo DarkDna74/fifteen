@@ -134,7 +134,7 @@
             "A♠", "2♠", "3♠", "4♠", "5♠", "6♠", "7♠", "8♠", "9♠", "10♠", "J♠", "Q♠", "K♠",
             "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦"
         ];
-        
+        let totCards = 15;
         let selectedCards = [];
         let chosenArray = [];
         
@@ -247,27 +247,52 @@
         }
         
         function startSecondPhase() {
+    // Creazione di un input per il numero
+    const inputContainer = document.createElement('div');
+    document.getElementById("table-container").innerHTML = "";
+    inputContainer.innerHTML = `
+        <label for="cardCount">Please enter a number between 10 and 15:</label>
+        <input type="number" id="cardCount" min="10" max="15" required>
+        <button id="confirmNumber">Confirm</button>
+    `;
+    document.body.appendChild(inputContainer);
+
+    // Funzione che viene chiamata al click del pulsante
+    document.getElementById("confirmNumber").addEventListener("click", function() {
+        const userInput = parseInt(document.getElementById("cardCount").value);
+        
+        // Verifica che il numero sia valido
+        if (userInput >= 10 && userInput <= 15) {
+            // Se il numero è valido, procedi con la funzione esistente
+            totCards = userInput;
             selectedCards = JSON.parse(localStorage.getItem("stack"));
             chosenArray = [];
             document.getElementById("table-container").innerHTML = "";
-            document.querySelector("h2").innerText = "Select 15 Cards";
-            updateProgressBar(0, 15);
+            document.querySelector("h2").innerText = "Select " + userInput + " Cards"; // Usa il numero scelto
+            updateProgressBar(0, userInput); // Aggiorna la progress bar
             createCardGrid("chooseCard");
+            
+            // Rimuovi l'input e il pulsante
+            inputContainer.remove();
+        } else {
+            alert("Please enter a number between 10 and 15.");
         }
+    });
+}
         
         function chooseCard(card, btn) {
             chosenArray.push(card);
             btn.disabled = true;
             btn.classList.add("disabled");
-            updateProgressBar(chosenArray.length, 15);
+            updateProgressBar(chosenArray.length, totCards);
             
-            if (chosenArray.length === 15) {
+            if (chosenArray.length === totCards) {
                 showFinalSelection(chosenArray);
             }
         }
 
         function showFinalSelection(cards) { 
-                document.querySelector("h2").innerText = "Your 15 Cards";
+                document.querySelector("h2").innerText = "Your "+totCards+" Cards";
                 document.getElementById("counter").style.display = "none";
                 document.querySelector(".progress-bar").style.display = "none";
                 
@@ -329,6 +354,3 @@
     </script>
 </body>
 </html>
-
-
-
