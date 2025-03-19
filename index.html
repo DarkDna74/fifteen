@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Card Selection</title>
+    <title>Selection of Number of Cards</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -117,7 +117,7 @@
     </style>
 </head>
 <body>
-    <h2>Card Selection</h2>
+    <h2>Selection of Number of Cards</h2>
     <div class="counter" id="counter"></div>
     <div id="idShow">
         <div id="idStack"></div>
@@ -251,7 +251,7 @@
     const inputContainer = document.createElement('div');
     document.getElementById("table-container").innerHTML = "";
     inputContainer.innerHTML = `
-        <label for="cardCount">Please enter a number between 10 and 15:</label>
+        <label for="cardCount">Please enter a number from 10 to 15:</label>
         <input type="number" id="cardCount" min="10" max="15" required>
         <button id="confirmNumber">Confirm</button>
     `;
@@ -275,7 +275,7 @@
             // Rimuovi l'input e il pulsante
             inputContainer.remove();
         } else {
-            alert("Please enter a number between 10 and 15.");
+            alert("Please enter a number from 10 to 15.");
         }
     });
 }
