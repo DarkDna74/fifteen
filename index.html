@@ -52,6 +52,20 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         
+        .undo_button {
+            background-color: #ff5555;;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            color: var(--text-color);
+            padding: 10px 0;
+            font-size: 14px;
+            cursor: pointer;
+            width: 150px;
+            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
         .card-button:active {
             transform: scale(0.95);
         }
@@ -118,6 +132,13 @@
 </head>
 <body>
     <h2>Selection of Number of Cards</h2>
+    <div id="btnUndoChoice"   style="display: none; text-align: right;">      
+        <button   class="undo_button" onclick="undoLastChoice()" >&lt;&lt;</button>
+      
+    </div>
+
+    <div  id="btnUndoSelect" style=" text-align: right;" ><button  class="undo_button" onclick="undoLastSelect()">&lt;&lt;</button></div>
+
     <div class="counter" id="counter"></div>
     <div id="idShow">
         <div id="idStack"></div>
@@ -136,8 +157,10 @@
         ];
         let totCards = 15;
         let selectedCards = [];
+        let selectedCardsId = [];
         let chosenArray = [];
-        
+        let chosenIdArray = [];
+
         function getColorClass(card) {
             if (card.includes('♥') || card.includes('♦')) {
                 return card.includes('♥') ? 'hearts' : 'diamonds';
@@ -204,12 +227,14 @@
             const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
             let colorClass ="";
             // Loop through each value
+            let l = 0;
             for (let i = 0; i < values.length; i++) {
                 // Loop through each suit in the specified order
                 for (let j = 0; j < suits.length; j++) {
                     const card = values[i] + suits[j];
                     colorClass = getColorClass(card);
-                    gridHTML += `<button class="card-button ${colorClass}" onclick="${clickHandler}('${card}', this)">${card}</button>`;
+                    gridHTML += `<button id="id_btn_${l}" class="card-button ${colorClass}" onclick="${clickHandler}('${card}', this)">${card}</button>`;
+                    l+=1;
                 }
             }
            
@@ -236,6 +261,7 @@
         
         function selectCard(card, btn) {
             selectedCards.push(card);
+            selectedCardsId.push(btn.id);
             btn.disabled = true;
             btn.classList.add("disabled");
             updateProgressBar(selectedCards.length, 52);
@@ -246,7 +272,37 @@
             }
         }
         
+        function undoLastSelect() {
+   
+            if (selectedCards.length > 0) {
+                // Rimuove l'ultimo elemento dai vettori
+                let lastCard = selectedCards.pop();
+                let lastBtnId = selectedCardsId.pop();
+
+                // Ripristina il bottone disabilitato
+                let lastBtn = document.getElementById(lastBtnId);
+                if (lastBtn) {
+                    
+                    lastBtn.disabled = false;
+                    lastBtn.classList.remove("disabled");
+                }
+
+                // Aggiorna la progress bar
+                updateProgressBar(selectedCards.length, 52);
+            }
+        }
+
+
+
+
+
         function startSecondPhase() {
+            console.log( document.getElementById("btnUndoSelect").style.display);
+            document.querySelector(".progress-bar").style.display = "block";
+            document.getElementById("counter").style.display = "block";
+            document.getElementById("btnUndoChoice").style.display="block";
+            document.getElementById("btnUndoSelect").style.display="none";
+            
     // Creazione di un input per il numero
     const inputContainer = document.createElement('div');
     document.getElementById("table-container").innerHTML = "";
@@ -279,9 +335,11 @@
         }
     });
 }
-        
-        function chooseCard(card, btn) {
+
+function chooseCard(card, btn) {
             chosenArray.push(card);
+            console.log(btn.id);
+            chosenIdArray.push(btn.id);
             btn.disabled = true;
             btn.classList.add("disabled");
             updateProgressBar(chosenArray.length, totCards);
@@ -290,6 +348,26 @@
                 showFinalSelection(chosenArray);
             }
         }
+        
+function undoLastChoice() {
+   
+    if (chosenArray.length > 0) {
+        // Rimuove l'ultimo elemento dai vettori
+        let lastCard = chosenArray.pop();
+        let lastBtnId = chosenIdArray.pop();
+
+        // Ripristina il bottone disabilitato
+        let lastBtn = document.getElementById(lastBtnId);
+        if (lastBtn) {
+           
+            lastBtn.disabled = false;
+            lastBtn.classList.remove("disabled");
+        }
+
+        // Aggiorna la progress bar
+        updateProgressBar(chosenArray.length, totCards);
+    }
+}
 
         function showFinalSelection(cards) { 
                 document.querySelector("h2").innerText = "Your "+totCards+" Cards";
@@ -316,6 +394,22 @@
                 finalHTML += "</ul>";
                 document.getElementById("table-container").innerHTML = finalHTML;
             }
+
+
+        function UndoClick()
+        {
+
+            document.getElementById(chosenIdArray[chosenIdArray.length-1]).
+            chosenArray.push(card);
+            chosenIdArray.push(btn.id);
+            btn.disabled = true;
+            btn.classList.add("disabled");
+            updateProgressBar(chosenArray.length, totCards);
+            
+            if (chosenArray.length === totCards) {
+                showFinalSelection(chosenArray);
+            }
+        }    
         
         function showFinalSelection2() {
             document.querySelector("h2").innerText = "Your 15 Cards";
@@ -346,6 +440,7 @@
             document.querySelector("h2").innerText = "Select All Cards";
             updateProgressBar(0, 52);
             createCardGrid("selectCard");
+            document.getElementById
         }
         
         checkStoredStack();
