@@ -333,9 +333,10 @@
         
         function checkStoredStack() {
             if (localStorage.getItem("stack")) {
-                selectedCards = JSON.parse(localStorage.getItem("stack"));
+                //selectedCards = JSON.parse(localStorage.getItem("stack"));
                // alert(selectedCards);
                 if (confirm("Do you want to use the saved stack?")) {
+                    selectedCards = JSON.parse(localStorage.getItem("stack"));
                     startSecondPhase();
                     return;
                 } else {
